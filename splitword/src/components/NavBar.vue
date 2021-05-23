@@ -11,7 +11,7 @@
         text-color="#fff"
         active-text-color="#ffd04b"
         >
-      <el-menu-item  index="/">知识上传</el-menu-item>
+      <el-menu-item  index="/Main">知识上传</el-menu-item>
       <el-menu-item  index="/Search">知识查询</el-menu-item>
       <el-menu-item>退出</el-menu-item>
     </el-menu>
@@ -22,8 +22,8 @@
 export default {
   data() {
     return {
-      activeIndex: '/',
-      activeIndex2: '/'
+      activeIndex: '/Main',
+      activeIndex2: '/Main'
     };
   },
   methods: {
