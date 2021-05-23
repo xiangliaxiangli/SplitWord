@@ -22,7 +22,7 @@
 
 <script>
 export default {
-  name: "file",
+  name: "Field_File",
   data(){
     return {
       url: "https://localhost:44366/api/Hello/DownloadFileByID/",

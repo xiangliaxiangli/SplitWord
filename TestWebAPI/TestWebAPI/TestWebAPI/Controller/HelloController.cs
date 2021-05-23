@@ -22,14 +22,32 @@ namespace TestWebAPI.Controller
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class HelloController : ApiController
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        //public string Get()
-        //{
-        //    return "Hello World";
-        //}
+        // GET api/<controller>
+        public IEnumerable<string> Get()
+        {
+            return new string[] { "value1", "value2" };
+        }
+
+        // GET api/<controller>/5
+        public string Get(int id)
+        {
+            return "value";
+        }
+
+        // POST api/<controller>
+        public void Post([FromBody] string value)
+        {
+        }
+
+        // PUT api/<controller>/5
+        public void Put(int id, [FromBody] string value)
+        {
+        }
+
+        // DELETE api/<controller>/5
+        public void Delete(int id)
+        {
+        }
         /// <summary>
         /// 接收前端传来的文件
         /// </summary>
@@ -121,6 +139,24 @@ namespace TestWebAPI.Controller
             return response;
         }
 
+        #region--根据领域名称获取全部的文章
+        [HttpPost]
+        public IHttpActionResult getAllFilesByField(string Field)
+        {
+            List<Field_File> list = new List<Field_File>();
+            Field_File temp = new Field_File();
+            temp.fileID = 1;
+            temp.filename = "你真的认识你自己吗？";
+            temp.keywords = new List<string>();
+            temp.keywords.Add("人工智能");
+            temp.keywords.Add("图像识别");
+            temp.keywords.Add("机器学习");
+            temp.keywords.Add("计算机");
+            temp.keywords.Add("科学");
+            list.Add(temp);
 
+            return Json<List<Field_File>>(list);
+        }
+        #endregion
     }
 }

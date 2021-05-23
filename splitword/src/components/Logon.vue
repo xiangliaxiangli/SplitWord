@@ -16,9 +16,9 @@
           <el-radio label="女"></el-radio>
         </el-radio-group>
       </el-form-item>
-<!--      <el-form-item label="性别" prop="sex">-->
-<!--        <el-input v-model.number="ruleForm.sex"></el-input>-->
-<!--      </el-form-item>-->
+      <!--      <el-form-item label="性别" prop="sex">-->
+      <!--        <el-input v-model.number="ruleForm.sex"></el-input>-->
+      <!--      </el-form-item>-->
       <el-form-item>
         <el-button type="primary" style="background-color: #A0D0EC" @click="submitForm('ruleForm')">提交</el-button>
         <el-button  @click="resetForm('ruleForm')">重置</el-button>
@@ -99,8 +99,10 @@ export default {
           let sex = this.ruleForm.sex;
           alert("即将向后台进行验证")
           //返回注册的内容到前端
-          this.axios.post('https://localhost:44366/api/User/Login/'+username+'/'+password+'/'+sex).then(response=>{
-            console.log(response.data);
+          this.axios.post('https://localhost:44366/api/User/Register?userName='+username+'&password='+password+'&sex='+sex).then(response=>{
+            console.log("发起注册请求");
+
+            console.log("response:"+response.data);
             let result = response.data;
             if(result==="success"){
               this.logining = false;
@@ -111,7 +113,7 @@ export default {
                 confirmButtonText: 'ok'
               })
               this.$router.push({path: '/'});
-            }else{
+            }else if(result==="fail"){
               this.logining = false;
               this.$alert('该用户名已经存在', '注册', {
                 confirmButtonText: 'ok'
@@ -143,6 +145,6 @@ export default {
   padding: 35px 35px 15px;
   background:  #A0D0EC;
   border: 1px solid #eaeaea;
-  //box-shadow: 0 0 25px #cac6c6;
+//box-shadow: 0 0 25px #cac6c6;
 }
 </style>

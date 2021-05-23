@@ -13,6 +13,7 @@
           {{field.name}}
         </el-tag>
       </el-card>
+      <br/>
       <!--    关键词输入-->
       <el-card>
         <p class="yellow lighten-3 black--text text--darken-3">请输入您要搜索的关键词(可选)</p>
@@ -22,6 +23,7 @@
           </el-input>
         </div>
       </el-card>
+      <br/>
       <!--    文章输入-->
       <el-card>
         <p class="blue lighten-3 black--text text--darken-3">请上传您要搜索的文章(可选)</p>
@@ -39,6 +41,7 @@
           <div slot="tip" class="el-upload__tip">只能上传word/pdf文件，且不超过500kb</div>
         </el-upload>
       </el-card>
+      <br/>
 <!--      结果上传-->
       <el-main>
         <el-button @click="search" type="primary" icon="el-icon-search">查询</el-button>

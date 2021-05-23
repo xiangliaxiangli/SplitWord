@@ -50,7 +50,7 @@ namespace TestWebAPI.Controller
             tempUser = db.User.FirstOrDefault(x => x.userName.Equals(userName) && x.password.Equals(password));
             if (tempUser != null)
             {
-                return "success";
+                return "success|" + tempUser.userType;
             }
             return "fail";
         }
@@ -80,7 +80,8 @@ namespace TestWebAPI.Controller
                     db.User.Add(tempUser);
                     db.SaveChanges();
                     return "success";
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     return "fail";
                 }
@@ -92,11 +93,12 @@ namespace TestWebAPI.Controller
         [HttpPost]
         public IHttpActionResult GetAllUserInfo()
         {
+            List<User> userList = new List<User>();
             #region
-            /*测试数据
+            //测试数据
             User temp = new User();
             temp.userName = "guyao";
-            temp.userSex = "nan";
+            temp.userSex = "男";
             temp.userType = "noraml";
             temp.UserID = 1;
             temp.password = "1234567";
@@ -105,24 +107,24 @@ namespace TestWebAPI.Controller
             User temp1 = new User();
 
             temp1.userName = "guyao1";
-            temp1.userSex = "nan1";
-            temp1.userType = "noraml1";
+            temp1.userSex = "女";
+            temp1.userType = "noraml";
             temp1.UserID = 11;
             temp1.password = "12345671";
             userList.Add(temp);
-            */
 
+            return Json<List<User>>(userList);
             #endregion
-            return Json<List<User>>(db.User.ToList());
+            //return Json<List<User>>(db.User.ToList());
         }
         #endregion
 
         #region--修改用户信息
-        public string ModifyUserInfo(int userId,string userName,string password,string sex,string userType)
+        public string ModifyUserInfo(int userId, string userName, string password, string sex, string userType)
         {
             User tempUser = null;
             tempUser = db.User.Find(userId);
-            if(tempUser!=null)
+            if (tempUser != null)
             {
                 try
                 {
@@ -135,7 +137,7 @@ namespace TestWebAPI.Controller
                     db.SaveChanges();
                     return "success";
                 }
-                catch(Exception  e)
+                catch (Exception e)
                 {
                     return "fail";
                 }
@@ -151,7 +153,7 @@ namespace TestWebAPI.Controller
             try
             {
                 User tempuser = db.User.Find(userID);
-                if(tempuser!=null)
+                if (tempuser != null)
                 {
                     db.User.Remove(tempuser);
                     db.SaveChanges();
@@ -161,8 +163,9 @@ namespace TestWebAPI.Controller
                 {
                     return "fail";
                 }
-                
-            }catch(Exception e)
+
+            }
+            catch (Exception e)
             {
                 return "fail";
             }

@@ -59,17 +59,34 @@ export default {
           //用户名密码传给后台验证进行登录验证
           let username = this.ruleForm2.username;
           let password = this.ruleForm2.password;
-          this.axios.post('https://localhost:44366/api/User/Login/'+username+'/'+password).then(response=>{
+          this.axios.post('https://localhost:44366/api/User/Login?userName='+username+'&password='+password).then(response=>{
             //打印返回的信息
+            console.log("发起登录请求！");
             console.log(response.data);
-            let result = response.data;
-            if(result==="success"){
+            let result = response.data.split('|');
+            console.log("result:"+result);
+            console.log("result[0]:"+result[0]);
+            console.log("result:[1]"+result[1]);
+
+            if(result[0]==="success"){
               this.logining = false;
               //全局存储用户信息 后续有需要再考虑
               //sessionStorage.setItem('user', this.ruleForm2.username);
               //登录成功
-              this.$router.push({path: '/Index'});
-            }else{
+              if(result[1]==="normal")
+              {
+                this.$router.push({path: '/Index'});
+              }
+              else if(result[1]==="admin")
+              {
+                //跳转到管理员界面
+                console.log("跳转到管理员界面");
+              }
+              else{
+                //错误
+              }
+
+            }else if(result[0]==="fail"){//当返回fail才表示用户存在，如果服务器没启动的话，也会是success之外的情况
               this.logining = false;
               this.$alert('用户名或者密码错误', '提示', {
                 confirmButtonText: 'ok'

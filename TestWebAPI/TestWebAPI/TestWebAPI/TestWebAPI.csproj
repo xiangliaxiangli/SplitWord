@@ -231,6 +231,7 @@
     <Compile Include="Controller\FileController.cs" />
     <Compile Include="Controller\HelloController.cs" />
     <Compile Include="Controller\UserController.cs" />
+    <Compile Include="Entities\Field_File.cs" />
     <Compile Include="Entities\HandleFile.cs" />
     <Compile Include="Entities\Init_words.cs" />
     <Compile Include="Entities\MyFile.cs" />
