@@ -59,7 +59,7 @@ export default {
           //用户名密码传给后台验证进行登录验证
           let username = this.ruleForm2.username;
           let password = this.ruleForm2.password;
-          this.axios('https://localhost:44366/api/User/Login/'+username+'/'+password).then(response=>{
+          this.axios.post('https://localhost:44366/api/User/Login/'+username+'/'+password).then(response=>{
             //打印返回的信息
             console.log(response.data);
             let result = response.data;

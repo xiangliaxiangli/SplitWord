@@ -99,7 +99,7 @@ export default {
           let sex = this.ruleForm.sex;
           alert("即将向后台进行验证")
           //返回注册的内容到前端
-          this.axios('https://localhost:44366/api/User/Login/'+username+'/'+password+'/'+sex).then(response=>{
+          this.axios.post('https://localhost:44366/api/User/Login/'+username+'/'+password+'/'+sex).then(response=>{
             console.log(response.data);
             let result = response.data;
             if(result==="success"){
