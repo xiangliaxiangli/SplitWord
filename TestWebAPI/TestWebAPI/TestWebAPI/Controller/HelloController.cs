@@ -158,5 +158,45 @@ namespace TestWebAPI.Controller
             return Json<List<Field_File>>(list);
         }
         #endregion
+
+
+        public HashSet<string> InitStopWordsDictionary()
+        {
+            HashSet<string> dict = new HashSet<string>();
+            string path = AppDomain.CurrentDomain.BaseDirectory + @"Words";
+            DirectoryInfo folder = new DirectoryInfo(path);
+            foreach (FileInfo file in folder.GetFiles("*.txt"))
+            {
+                try
+                {
+                    using (StreamReader sr = new StreamReader(file.FullName))
+                    {
+                        string line;
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            dict.Add(line);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("The file could not be read:");
+                    Console.WriteLine(e.Message);
+                }
+            }
+            return dict;
+        }
+
+        [HttpPost]
+        public List<WordFrequency> SplitText()
+        {
+            string text = "梦幻西游无限仙玉版到底有没有？今天我就带大家来了解一下，首先梦幻西游是网易游戏的一个拳头产品，这个问题已经不必多说了，梦幻西游是很多80，90后童年美好的回忆，不过当时大家都是小孩子，经济上没有独立，所以很多人玩梦幻就是耗时间，没办法氪金，所以在当时就有很多人想，如果梦幻西游仙玉可以无限使用该多好啊。";
+            string field = "0";
+            DomainDictionary domain = new DomainDictionary();
+            Segment segment = new Segment(domain, InitStopWordsDictionary());
+            List<WordFrequency> wordFrequencies = Statistics.SortWordsByFrequency(segment.CutArticle(text, field));
+            return wordFrequencies;
+        }
+
     }
 }
