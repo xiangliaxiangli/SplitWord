@@ -22,77 +22,33 @@ namespace TestWebAPI.Controller
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class HelloController : ApiController
     {
-        // GET api/<controller>
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<controller>/5
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<controller>
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<controller>/5
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<controller>/5
-        public void Delete(int id)
-        {
-        }
-        /// <summary>
-        /// 接收前端传来的文件
-        /// </summary>
-        /// <returns></returns>
-        //public IHttpActionResult getFiles()
-        //{
-        //    //获取文件
-        //    HttpFileCollection files = HttpContext.Current.Request.Files;
-        //    string filename = "NotFile";
-        //    if (files.Count != 0)
-        //    {
-        //        filename = "Fileget";
-        //    }
-        //    foreach (string key in files.AllKeys)
-        //    {
-        //        filename = key;
-        //        HttpPostedFile file1 = files[key];
-        //        if (string.IsNullOrEmpty(file1.FileName) == false)
-        //        {
-        //            //filename = file1.FileName;
-        //        }
-        //        //file1.SaveAs(HttpContext.Current.Server.MapPath("~/Files/") + file1.FileName);
-        //    }
-        //    return Ok(filename);
-        //}
-
+        
         /// <summary>
         /// 从前端获取用户传输的文件和参数
         /// 参数目前包括的是用户选择的领域
         /// </summary>
         /// <returns></returns>
         [System.Web.Http.HttpPost]
-        public string[] Post()
+        public List<WordFrequency> Post()
         {
             var files = HttpContext.Current.Request.Files;  //获取所有的文件
-            var fields = HttpContext.Current.Request.Params["fields"];
-            var temp_ = JsonConvert.DeserializeObject(fields);
-            JArray jb = (JArray)temp_;  //接收前端传来的用户选择的领域  可以让后面分词的同学选择相应的领域词库
+            var field = HttpContext.Current.Request.Params["fields"];
+            MessageBox.Show(field);  //打印出用户选择的领域号
+            //var temp_ = JsonConvert.DeserializeObject(fields);
+            //接收前端传来的用户选择的领域  可以让后面分词的同学选择相应的领域词库
+            //JArray jb = (JArray)temp_;  
+            //MessageBox.Show(jb[0].ToString());
             HandleFile hf = new HandleFile(); //文件处理程序
             foreach (string key in files.AllKeys)
             {
                 HttpPostedFile file = files[key];
                 if (string.IsNullOrEmpty(file.FileName) == false)
                 {
-                    return hf.splitFileToSenstence(file);
+                    string text = hf.splitFileToSenstence(file);  //获取文章内容
+                    DomainDictionary domain = new DomainDictionary();
+                    Segment segment = new Segment(domain, InitStopWordsDictionary());
+                    List<WordFrequency> wordFrequencies = Statistics.SortWordsByFrequency(segment.CutArticle(text, field));
+                    return wordFrequencies;
                 }
             }
             return null;
@@ -159,7 +115,6 @@ namespace TestWebAPI.Controller
         }
         #endregion
 
-
         public HashSet<string> InitStopWordsDictionary()
         {
             HashSet<string> dict = new HashSet<string>();
@@ -187,15 +142,51 @@ namespace TestWebAPI.Controller
             return dict;
         }
 
+        //[HttpPost]
+        //public List<WordFrequency> SplitText()
+        //{
+        //    string text = "梦幻西游无限仙玉版到底有没有？今天我就带大家来了解一下，首先梦幻西游是网易游戏的一个拳头产品，这个问题已经不必多说了，梦幻西游是很多80，90后童年美好的回忆，不过当时大家都是小孩子，经济上没有独立，所以很多人玩梦幻就是耗时间，没办法氪金，所以在当时就有很多人想，如果梦幻西游仙玉可以无限使用该多好啊。";
+        //    string field = "0";
+        //    DomainDictionary domain = new DomainDictionary();
+        //    Segment segment = new Segment(domain, InitStopWordsDictionary());
+        //    List<WordFrequency> wordFrequencies = Statistics.SortWordsByFrequency(segment.CutArticle(text, field));
+        //    return wordFrequencies;
+        //}
+
+
         [HttpPost]
-        public List<WordFrequency> SplitText()
+        //存储领域词汇
+        public string UploadKeyWords()
         {
-            string text = "梦幻西游无限仙玉版到底有没有？今天我就带大家来了解一下，首先梦幻西游是网易游戏的一个拳头产品，这个问题已经不必多说了，梦幻西游是很多80，90后童年美好的回忆，不过当时大家都是小孩子，经济上没有独立，所以很多人玩梦幻就是耗时间，没办法氪金，所以在当时就有很多人想，如果梦幻西游仙玉可以无限使用该多好啊。";
-            string field = "0";
-            DomainDictionary domain = new DomainDictionary();
-            Segment segment = new Segment(domain, InitStopWordsDictionary());
-            List<WordFrequency> wordFrequencies = Statistics.SortWordsByFrequency(segment.CutArticle(text, field));
-            return wordFrequencies;
+            var keywords = HttpContext.Current.Request.Params["keywords"];
+            var temp = JsonConvert.DeserializeObject(keywords);
+            //用户选择的关键字 将其存入数据库
+            JArray jb = (JArray)temp;
+         
+            //MessageBox.Show(jb[0].ToString());
+            //MessageBox.Show(jb[1].ToString());
+            //MessageBox.Show(jb[2].ToString());
+            return "Success";
+        }
+
+        //前端用户选择领域，输入查询语句，后端处理返回所有相关文件
+        //Field:用户选取的领域
+        //content:用户输入的查询语句
+        //return:List<Field_File> 只返回文件名称和文件在数据库中的ID
+        public IHttpActionResult Search(string Field,string content)
+        {
+            MessageBox.Show(Field + " " + content);
+            List<Field_File> list = new List<Field_File>();
+            Field_File temp = new Field_File();
+            temp.fileID = 1;
+            temp.filename = "你真的认识你自己吗？";
+            list.Add(temp);
+            Field_File temp2 = new Field_File();
+            temp2.fileID = 2;
+            temp2.filename = "非常不错";
+            list.Add(temp2);
+            return Json<List<Field_File>>(list);
+
         }
 
     }

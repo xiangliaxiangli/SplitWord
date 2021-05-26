@@ -6,6 +6,7 @@ using iTextSharp.text.pdf;
 using System.IO;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using Spire.Doc;
 
 namespace TestWebAPI.Entities
 {
@@ -29,6 +30,51 @@ namespace TestWebAPI.Entities
             split_word = Init_words.split_word;  //通过全局静态类获取静态停用词
         }
 
+        //public string handle_word(string path)
+        //{
+        //    MessageBox.Show("看看看看扩");
+        //    //创建word 的com
+        //    //慢得离谱
+        //    Word.Application app = new Microsoft.Office.Interop.Word.Application();
+        //    Type wordType = app.GetType();
+        //    Word.Document doc = null;
+        //    object unknow = Type.Missing;
+        //    app.Visible = false;
+
+        //    //慢得也离谱
+        //    MessageBox.Show("?sss");
+        //    object files = path;
+        //    doc = app.Documents.Open(ref files,
+        //    ref unknow, ref unknow, ref unknow, ref unknow,
+        //    ref unknow, ref unknow, ref unknow, ref unknow,
+        //    ref unknow, ref unknow, ref unknow, ref unknow,
+        //    ref unknow, ref unknow, ref unknow);
+        //    int count = doc.Paragraphs.Count;
+        //    StringBuilder sb = new StringBuilder();
+        //    MessageBox.Show("开始!");
+        //    //循环读取文件内容
+        //    for (int i = 1; i <= count; i++)
+        //    {
+
+        //        sb.Append(doc.Paragraphs[i].Range.Text.Trim());
+        //    }
+        //    MessageBox.Show("结束");
+        //    //关闭word文件
+        //    doc.Close(ref unknow, ref unknow, ref unknow);
+        //    wordType.InvokeMember("Quit", System.Reflection.BindingFlags.InvokeMethod, null, app, null);
+        //    doc = null;
+        //    app = null;
+        //    //垃圾回收
+        //    GC.Collect();
+        //    GC.WaitForPendingFinalizers();
+        //    //转化为字符串
+        //    string temp = sb.ToString();
+        //    //如果有必要 转化为txt文件输出
+        //    return temp;
+        //    //预处理
+        //}
+
+
         /// <summary>
         /// 对word类型的文件进行处理 
         /// </summary>
@@ -36,41 +82,12 @@ namespace TestWebAPI.Entities
         /// <returns></returns>
         public string handle_word(string path)
         {
-            //创建word 的com
-            Word.Application app = new Microsoft.Office.Interop.Word.Application();
-            Type wordType = app.GetType();
-            Word.Document doc = null;
-            object unknow = Type.Missing;
-            app.Visible = false;
-
-            object files = path;
-            doc = app.Documents.Open(ref files,
-            ref unknow, ref unknow, ref unknow, ref unknow,
-            ref unknow, ref unknow, ref unknow, ref unknow,
-            ref unknow, ref unknow, ref unknow, ref unknow,
-            ref unknow, ref unknow, ref unknow);
-            int count = doc.Paragraphs.Count;
-            StringBuilder sb = new StringBuilder();
-            //循环读取文件内容
-            for (int i = 1; i <= count; i++)
-            {
-
-                sb.Append(doc.Paragraphs[i].Range.Text.Trim());
-            }
-
-            //关闭word文件
-            doc.Close(ref unknow, ref unknow, ref unknow);
-            wordType.InvokeMember("Quit", System.Reflection.BindingFlags.InvokeMethod, null, app, null);
-            doc = null;
-            app = null;
-            //垃圾回收
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            //转化为字符串
-            string temp = sb.ToString();
-            //如果有必要 转化为txt文件输出
-            return temp;
-            //预处理
+            //加载word文档
+            Document doc = new Document();
+            doc.LoadFromFile(path);
+            //使用GetText方法获取文档的所有文本
+            string s = doc.GetText();
+            return s;
         }
 
         /// <summary>
@@ -121,7 +138,7 @@ namespace TestWebAPI.Entities
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
-        public string[] splitFileToSenstence(HttpPostedFile file)
+        public string splitFileToSenstence(HttpPostedFile file)
         {
             //MessageBox.Show("分词开始");
             string[] array = file.FileName.Split('.');
@@ -142,21 +159,21 @@ namespace TestWebAPI.Entities
             {
                 all_content = handle_txt(path);
             }
-            if (all_content != null)
-            {
-                sentence = all_content.Split(split_word, StringSplitOptions.RemoveEmptyEntries);
-            }
-            string path_save_sentence = HttpContext.Current.Server.MapPath("~/OutPut/") + array[0] + ".txt";
-            //创建文件输入流 (文件的路径,存在同名文件时候覆盖源文件,文件的格式)
-            StreamWriter sw = new StreamWriter(path_save_sentence,false,Encoding.UTF8);
-            for(int i = 0; i < sentence.Length; i++)
-            {
-                sw.WriteLine(sentence[i]);
-            }
-            sw.Flush();
-            sw.Close();
+            //if (all_content != null)
+            //{
+            //    sentence = all_content.Split(split_word, StringSplitOptions.RemoveEmptyEntries);
+            //}
+            //string path_save_sentence = HttpContext.Current.Server.MapPath("~/OutPut/") + array[0] + ".txt";
+            ////创建文件输入流 (文件的路径,存在同名文件时候覆盖源文件,文件的格式)
+            //StreamWriter sw = new StreamWriter(path_save_sentence,false,Encoding.UTF8);
+            //for(int i = 0; i < sentence.Length; i++)
+            //{
+            //    sw.WriteLine(sentence[i]);
+            //}
+            //sw.Flush();
+            //sw.Close();
             //MessageBox.Show("分词结束");
-            return sentence;
+            return all_content;
         }
     }
 }

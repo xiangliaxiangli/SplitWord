@@ -47,9 +47,10 @@ export default {
     }
   },
   created() {
-    this.url =this.url+this.$route.params.FileID;
+    alert(this.$route.query.FileID);
+    this.url =this.url+this.$route.query.FileID;
     console.log(this.url);
-    this.show_file(this.$route.params.FileID);
+    this.show_file(this.$route.query.FileID);
   }
 }
 </script>

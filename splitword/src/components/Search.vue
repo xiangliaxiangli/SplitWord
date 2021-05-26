@@ -16,31 +16,31 @@
       <br/>
       <!--    关键词输入-->
       <el-card>
-        <p class="yellow lighten-3 black--text text--darken-3">请输入您要搜索的关键词(可选)</p>
+        <p class="yellow lighten-3 black--text text--darken-3">请输入您要搜索内容</p>
         <div style="margin-top: 15px;">
           <el-input placeholder="请输入内容" v-model="keyWords">
-            <el-button slot="append" icon="el-icon-search"></el-button>
+<!--            <el-button slot="append" icon="el-icon-search"></el-button>-->
           </el-input>
         </div>
       </el-card>
-      <br/>
+<!--      <br/>-->
       <!--    文章输入-->
-      <el-card>
-        <p class="blue lighten-3 black--text text--darken-3">请上传您要搜索的文章(可选)</p>
-        <el-upload
-            class="upload-demo"
-            ref="upload"
-            action="https://jsonplaceholder.typicode.com/posts/"
-            :on-preview="handlePreview"
-            :on-remove="handleRemove"
-            :on-change="handleOnchange"
-            :file-list="fileList"
-            :auto-upload="false">
-          <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-          <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传word/pdf文件，且不超过500kb</div>
-        </el-upload>
-      </el-card>
+<!--      <el-card>-->
+<!--        <p class="blue lighten-3 black&#45;&#45;text text&#45;&#45;darken-3">请上传您要搜索的文章(可选)</p>-->
+<!--        <el-upload-->
+<!--            class="upload-demo"-->
+<!--            ref="upload"-->
+<!--            action="https://jsonplaceholder.typicode.com/posts/"-->
+<!--            :on-preview="handlePreview"-->
+<!--            :on-remove="handleRemove"-->
+<!--            :on-change="handleOnchange"-->
+<!--            :file-list="fileList"-->
+<!--            :auto-upload="false">-->
+<!--          <el-button slot="trigger" size="small" type="primary">选取文件</el-button>-->
+<!--          <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>-->
+<!--          <div slot="tip" class="el-upload__tip">只能上传word/pdf文件，且不超过500kb</div>-->
+<!--        </el-upload>-->
+<!--      </el-card>-->
       <br/>
 <!--      结果上传-->
       <el-main>
@@ -48,16 +48,21 @@
       </el-main>
 <!--      结果展示-->
       <el-card >
+        <el-header
+            v-for="(file,index) in result_file"
+        >
         <el-container direction="horizontal">
           <el-link
-              v-for="file in result_file"
               @click="showFile(file.fileID)"
           >{{file.filename}}</el-link>
+<!--          :to="{name:'File',params:{FileID:file.fileID}}"-->
           <el-rate
-              v-model="value"
-              show-text>
+              v-model="values[index]"
+              show-text
+              @click="evaluate">
           </el-rate>
         </el-container>
+        </el-header>
       </el-card>
     </v-container>
   </el-main>
@@ -70,24 +75,28 @@ export default {
   name: "Search",
   data(){
     return{
+      values:[null,],
       Fields:[
-        {name:"计算机",type:"info"},
-        {name:"数学",type:"info"},
-        {name:"医学",type:"info"},
-        {name:"财经",type:"info"},
-        {name:"物理",type:"info"},
-        {name:"化学",type:"info"}
+        {name:"游戏",type:"info"},
+        {name:"理工行业",type:"info"},
+        {name:"人文社科",type:"info"},
+        {name:"生活百科",type:"info"},
+        {name:"体育运动",type:"info"},
+        {name:"文化艺术",type:"info"},
+        {name:"娱乐休闲",type:"info"}
       ],
       keyWords: null,
       fileList: [],
       hidden_result: true,
       url: "",
       result_file:[
-        {filename:"时间简史",fileID:1}
-      ],
+      ]
     }
   },
   methods:{
+    evaluate(){
+
+    },
     handleOnchange(res,file){
       if(res){
         let reader = new FileReader();
@@ -130,20 +139,41 @@ export default {
     },
     search(){
       this.hidden_result = false;
-      console.log(this.hidden_result)
+      if(this.keyWords==null){
+        this.$alert('搜索内容不可以为空', '提示', {
+          confirmButtonText: 'ok'
+        })
+      }else{
+        let fields_ = [];
+        for(let i = 0;i<this.Fields.length;i++){
+          console.log(this.Fields[i].type);
+          if(this.Fields[i].type!=='info'){
+            fields_.push(this.Fields[i].name);
+          }
+        }
+        let temp = JSON.stringify(fields_);
+        this.axios.post('https://localhost:44366/api/Hello/Search?Field='+temp+'&content='+this.keyWords).then(response=>{
+          this.result_file = response.data;
+          //评价系统也多了一个
+          for(let i = 0;i<response.data.length;i++){
+            this.values.push(null);
+          }
+        })
+      }
     },
     //跳转显示文章内容
     showFile(fileID){
       console.log("你好")
-      this.$router.push({
+      let router = this.$router.resolve({
         name: 'File',
-        params:{
+        query:{
           FileID: fileID
         }
       })
+      window.open(router.href,'_blank');
     },
+    }
   }
-}
 </script>
 
 <style scoped>

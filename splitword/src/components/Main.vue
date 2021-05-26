@@ -37,7 +37,10 @@
           <div></div>
         </el-card>
         <el-main>
-          <el-button @click="" type="primary" icon="el-icon-search">提交</el-button>
+          <el-button @click="UploadKeyWords" type="primary" icon="el-icon-search">提交</el-button>
+        </el-main>
+        <el-main>
+          <el-button @click="test" type="primary" icon="el-icon-search">测试</el-button>
         </el-main>
       </v-container>
     </el-main>
@@ -50,46 +53,73 @@ export default {
   data(){
     return{
       fields: [
-        {name:"计算机",type:"info"},
-        {name:"数学",type:"info"},
-        {name:"医学",type:"info"},
-        {name:"财经",type:"info"},
-        {name:"物理",type:"info"},
-        {name:"化学",type:"info"}
+        {name:"游戏",type:"info",ID:"0"},
+        {name:"理工行业",type:"info",ID:"1"},
+        {name:"人文社科",type:"info",ID:"2"},
+        {name:"生活百科",type:"info",ID:"3"},
+        {name:"体育运动",type:"info",ID:"4"},
+        {name:"文化艺术",type:"info",ID:"5"},
+        {name:"娱乐休闲",type:"info",ID:"6"}
       ],
       file: null,
-      labels: null,
+      labels: [],
       tips_hidden: true
     }
   },
   methods:{
+    test(){
+      this.axios.post('https://localhost:44366/api/Hello/SplitText').then(response=>{
+        console.log(response.data)
+      })
+    },
     //将用户上传的文件传输到后端
     UpLoadFile(){
       console.log(this.file.name)
       //创建FormData 对象
       let param = new FormData();
-      let fields_ = [];
+      let fields_;
       for(let i = 0;i<this.fields.length;i++){
         if(this.fields[i].type!=="info"){
-          fields_.push(this.fields[i].name);
+          fields_ = this.fields[i].ID;
         }
       }
-      let temp = JSON.stringify(fields_);
       param.append("file", this.file);
-      param.append("fields",temp);
+      param.append("fields",fields_);
       this.axios.post('https://localhost:44366/api/Hello/Post',param,{
         headers: {
           "Content-Type": "multipart/form-data"
         }
       }).then(response=>{
         console.log(response.data);
-        this.labels = response.data;
+        console.log(response.data[0].word);
+        for(let i = 0;i<response.data.length;i++){
+          this.labels.push(response.data[i].word);
+        }
         this.tips_hidden = false;
       })
     },
     //用户挑选完关键词之后，将剩下的词语传递会后端进行词语查找
     UploadKeyWords(){
-
+      let param = new FormData();
+      let keywords = JSON.stringify(this.labels);
+      param.append("keywords",keywords);
+      this.axios.post('https://localhost:44366/api/Hello/UploadKeyWords',param,{
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }).then(response=>{
+        console.log(response.data);
+        if(response.data==="Success"){
+          //上传成功
+          this.$alert('上传知识成功，感谢您的慷慨！', '提示', {
+            confirmButtonText: 'ok'
+          })
+        }else{
+          this.$alert('系统出了点问题，程序员们正在抢救中', '提示', {
+            confirmButtonText: 'ok'
+          })
+        }
+      })
     },
     //关闭标签按钮
     handleClose(tag) {
